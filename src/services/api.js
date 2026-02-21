@@ -1,83 +1,64 @@
 import axios from "axios";
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://13.210.33.250";
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL || "/api"
+).replace(/\/$/, "");
 
+const normalizeUrl = (url = "") => {
+  const trimmed = String(url).replace(/^\/+/, "");
+  return trimmed.replace(/^api\//, "");
+};
+
+const resolveConfig = (config = {}) => {
+  if (Object.prototype.hasOwnProperty.call(config, "headers")) {
+    const { headers = {}, ...rest } = config;
+    return {
+      ...rest,
+      headers: {
+        Accept: "application/json",
+        ...headers,
+      },
+    };
+  }
+
+  return {
+    headers: {
+      Accept: "application/json",
+      ...config,
+    },
+  };
+};
 
 const Api = {
+  get: async (url, config = {}) => {
+    return axios.get(
+      `${API_BASE_URL}/${normalizeUrl(url)}`,
+      resolveConfig(config)
+    );
+  },
 
-    get: async (url, header) => {
-        try {
-            let result = await axios.get(`${apiUrl}/${url}`,
-                {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        ...header
-                    }
-                }
-            )
-            return result
-        }
-        catch (err) {
-            return err
-        }
-    },
+  post: async (url, data, config = {}) => {
+    return axios.post(
+      `${API_BASE_URL}/${normalizeUrl(url)}`,
+      data,
+      resolveConfig(config)
+    );
+  },
 
-    post: async (url, data, header) => {
-        try {
-            let result = await axios.post(`${apiUrl}/${url}`, data,
-                {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        ...header
-                    }
-                }
-            )
-            return result
-        }
-        catch (err) {
-            return err
-        }
-    },
+  delete: async (url, config = {}) => {
+    return axios.delete(
+      `${API_BASE_URL}/${normalizeUrl(url)}`,
+      resolveConfig(config)
+    );
+  },
 
-    delete: async (url, header) => {
-        try {
-            let result = await axios.delete(`${apiUrl}/${url}`,
-                {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        ...header
-                    }
-                }
-            )
-            return result
-        }
-        catch (err) {
-            return err
-        }
-    },
+  put: async (url, data, config = {}) => {
+    return axios.put(
+      `${API_BASE_URL}/${normalizeUrl(url)}`,
+      data,
+      resolveConfig(config)
+    );
+  },
+};
 
-    put: async (url, data, header) => {
-        try {
-            let result = await axios.put(`${apiUrl}/${url}`, data,
-                {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        ...header
-                    }
-                }
-            )
-            return result
-        }
-        catch (err) {
-            return err
-        }
-    }
-
-}
-
-export default Api
-
+export default Api;

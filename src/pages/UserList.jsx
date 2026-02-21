@@ -33,10 +33,10 @@ export default function UserList() {
         const token = localStorage.getItem("token");
         const companyId = localStorage.getItem("company_id");
 
-        const res = await Api.get("api/user", {
+        const res = await Api.get("user", {
          
             Authorization: `Bearer ${token}`,
-            "company-id": companyId,
+            company_id: companyId,
             Accept: "application/json",
         
         });
@@ -64,17 +64,13 @@ export default function UserList() {
     setUsers(updatedUsers);
 
     try {
-      await Api.put(
-        `api/user/${user.id}`,
-        { status: !user.status },
-        {
-         
-            Authorization: `Bearer ${token}`,
-            "company-id": companyId,
-            Accept: "application/json",
-         
-        }
-      );
+      const formData = new FormData();
+      formData.append("status", user.status ? "0" : "1");
+      await Api.post(`user/${user.id}/status`, formData, {
+        Authorization: `Bearer ${token}`,
+        company_id: companyId,
+        Accept: "application/json",
+      });
 
       toast.success("Status updated successfully");
     } catch {
@@ -94,10 +90,10 @@ export default function UserList() {
       const token = localStorage.getItem("token");
       const companyId = localStorage.getItem("company_id");
 
-      await Api.delete(`api/user/${deleteId}`, {
+      await Api.delete(`user/${deleteId}`, {
       
           Authorization: `Bearer ${token}`,
-          "company-id": companyId,
+          company_id: companyId,
           Accept: "application/json",
         
       });
