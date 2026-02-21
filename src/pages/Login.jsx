@@ -48,23 +48,34 @@ export default function Login() {
       formData.append("password", form.password);
       formData.append("ip_address", "220.233.36.40");
 
-      const res = await Api.post("api/login", formData, {
+      const res = await Api.post("login", formData, {
         headers: {
           Accept: "application/json",
         },
       });
 
-      console.log("LOGIN RESPONSE:", res.data);
+      const data = res?.data;
+      console.log("LOGIN RESPONSE:", data);
 
-      if (res.data.isExpired === 1) {
-        toast.success(res.data.message);
+      if (!data) {
+        toast.error("Invalid server response");
         return;
       }
 
-      localStorage.setItem("token", res.data.access_token);
+      if (data.isExpired === 1) {
+        toast.success(data.message);
+        return;
+      }
+
+      if (!data.access_token) {
+        toast.error(data.message || "Login failed");
+        return;
+      }
+
+      localStorage.setItem("token", data.access_token);
       localStorage.setItem(
         "company_id",
-        res.data.companies?.[0]?.id
+        data.companies?.[0]?.id || ""
       );
 
       toast.success("Login successful");
